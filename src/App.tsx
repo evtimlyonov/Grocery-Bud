@@ -4,7 +4,9 @@ import { List } from './components/List';
 import { Form } from './components/Form';
 import { connect } from 'react-redux';
 import { RootState, RootDispatch } from './models/store';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+
+import { getLocalStorage } from './utils';
 
 const mapState = (state: RootState) => ({
   groceries: state.groceries,
@@ -26,11 +28,17 @@ type Props = StateProps & DispatchProps;
 type FormType = {
   name: string;
 };
+
 const MainApp = (props: Props) => {
   const [isEditing, setIsEditing] = useState(false);
   const [taskName, setTaskName] = useState('');
   const [taskId, setTaskId] = useState('');
   const [alert, setAlert] = useState({ show: false, msg: '', type: '' });
+  const [list, setList] = useState(getLocalStorage());
+
+  useEffect(() => {
+    localStorage.setItem('list', JSON.stringify(props.groceries));
+  }, [props.groceries]);
 
   const showAlert = (show = false, type = '', msg = '') => {
     setAlert({ show, type, msg });
@@ -83,7 +91,6 @@ const MainApp = (props: Props) => {
     setTaskName(e.target.value);
   };
 
-  console.log('rerender');
   return (
     <section className='bg-white mx-auto w-[90vw] max-w-xl mt-40 rounded shadow-xl p-8'>
       <Form
